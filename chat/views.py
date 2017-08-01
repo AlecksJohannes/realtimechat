@@ -20,14 +20,13 @@ def index(request):
 def conversation(request):
     parsed_json = {}
     if(request.method == "POST"):
-        messages = get_conversation_or_create_new(request.POST.get('sender_id'), request.POST.get('recipient_id')).values('body', 'is_read')
+        messages = get_conversation_or_create_new(request.POST.get('sender_id'), request.POST.get('recipient_id'))
         parsed_json['messages'] = list(messages)
         parsed_json['code'] = 300
         return HttpResponse(json.dumps(parsed_json), content_type='application/json')
     else:
         response = error_response()
         return HttpResponse(response, content_type='application/json')
-
 
 @property
 def websocket_group(self):

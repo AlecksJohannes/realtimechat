@@ -1,29 +1,19 @@
-from channels.auth import channel_session_user_from_http
 import json
-from channels import Channel
+from channels import Channel, Group
+from channels.auth import channel_session_user_from_http, channel_session_user
 
-
-@channel_session_user_from_http
-def ws_connect(message):
+@channel_session_user
+def ws_connect(message, id):
+    print("HAHAHA")
+    print(id)
+    print(message.user)
     message.reply_channel.send({'accept': True})
     message.channel_session['conversations'] = []
+    Group('conversation-%s' % id).add(message.reply_channel)
 
-
-def ws_receive(message):
-    payload = json.loads(message['text'])
-    payload['reply_channel'] = message.content['reply_channel']
-    Channel('chat.receive').send(playload)
-
-def chat_join(message):
-    conversation = get_conversation_or_error(1, message.user)
-    conversation.websocket_group.add(message.reply_channel)
-    message.channel_session['conversations'] = list(set(message.channel_session['conversations']).union([conversation.id]))
-    message.reply_channel.send({
-        'text': json.dumps({
-            'join': str(conversation.id),
-        }),
+def ws_receive(message, id):
+    Group('conversation-%s' % id).send({
+        'text': message['text'],
     })
+    
 
-def chat_send(message):
-    conversation = get_conversation_or_error(message['conversation'], message.user)
-    conversation.send_message(message['message'], message.user)

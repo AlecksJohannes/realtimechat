@@ -13,9 +13,10 @@ class User(models.Model):
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
+
 class Conversation(models.Model):
-    sender_id = models.ForeignKey(User, related_name='%(class)s_sender')
-    recipient_id = models.ForeignKey(User, related_name='%(class)s_receipient')
+    sender = models.ForeignKey(User, related_name='%(class)s_sender')
+    recipient= models.ForeignKey(User, related_name='%(class)s_receipient')
 
 
 
