@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels'
+    'channels',
+    'chat'
 ]
 
 MIDDLEWARE = [
@@ -83,6 +84,20 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': 5432,
     }
+}
+
+redis_host = os.environ.get('REDIS_HOST', 'localhost')
+
+# Channels layer definition
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [(redis_host, 6379)],
+        },
+        'ROUTING': 'realtimechat.routing.channel_routing',
+    },
 }
 
 
