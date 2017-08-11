@@ -1,7 +1,6 @@
-from functools import wraps
 from django.db.models import Q
-from .models import Conversation, Message
 import json
+from rest_framework_jwt.settings import api_settings
 
 def get_conversation_or_create_new(sender_id, recipient_id):
     try:
@@ -16,9 +15,8 @@ def get_conversation_or_create_new(sender_id, recipient_id):
         conversation.save()
         return conversation
 
-
-def error_response():
+def error_response(code):
     response = {}
-    response['error'] = 404
+    response['error'] = code
     response['errors'] = { 'description': 'Error page not found' }
     return json.dumps(response)
