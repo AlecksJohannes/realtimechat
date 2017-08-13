@@ -17,11 +17,18 @@ from django.conf.urls import url
 from django.contrib import admin
 from chat import views
 from channels import route
+from rest_framework_jwt.views import verify_jwt_token
+from chat import activeuser
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
     url(r'^conversation', views.conversation),
     url(r'^register', views.register),
-    url(r'^login', views.login)
+    url(r'^login', views.login),
+    url(r'^api-token-verify/', verify_jwt_token),
+    url(
+        '^api-activate/',
+        activeuser.ActivateUser.as_view()
+    )
 ]

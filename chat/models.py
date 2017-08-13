@@ -8,43 +8,47 @@ from chat import utils
 import bcrypt
 import json
 from rest_framework_jwt.settings import api_settings
+from django.contrib.auth.models import UserManager
 
+jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 @python_2_unicode_compatible
 class User(models.Model):
-    username = models.CharField(max_length=100)
+    username = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=255)
-    email = models.CharField(max_length=255, unique=True)
     is_authenticated = models.BooleanField(default=False)
     is_anonymous = models.BooleanField(default=True)
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    is_active = models.BooleanField(default=False)
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['password']
+    objects = UserManager()
 
     def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return "%s" % (self.username)
 
 def user_create(request):
     if request.method == 'POST':
         user = User(username = request.POST.get('username'),
-            email = request.POST.get('email'),
-            is_authenticated = True,
+            password = bcrypt.hashpw(request.POST.get('password').encode('utf-8'), bcrypt.gensalt(14)),
+            is_active = True,
             is_anonymous = False,
-            password = bcrypt.hashpw(request.POST.get('password').encode('utf-8'), bcrypt.gensalt(14)))
+            is_authenticated = True)
         user.save()
-        return json.dumps(model_to_dict(user))
+        payload = jwt_payload_handler(user)
+        token = jwt_encode_handler(payload)
+        return JsonResponse({'status':'success','token': token, 'code': 302, 'id': user.id })
     else:
         return JsonResponse({'status':'false','message':'cykablyat', 'code': 404})
 
 
 def user_login(request):
     if request.method == 'POST':
-        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         try:
-            user = User.objects.get(email = request.POST.get('email'))
+            user = User.objects.get(username = request.POST.get('username'))
             if bcrypt.checkpw(request.POST.get('password').encode('utf-8'), user.password.encode('utf-8')):
                 payload = jwt_payload_handler(user)
                 token = jwt_encode_handler(payload)
-                return JsonResponse({'status':'success','message':'cykablyat', 'code': 302, 'token': token })
+                return JsonResponse({'status':'success','message':'cykablyat', 'code': 302, 'token': token, 'id': user.id})
             else:
                 return JsonResponse({'status':'failure','message':'cykablyat', 'code': 404})
         except User.DoesNotExist:
