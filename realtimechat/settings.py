@@ -25,7 +25,7 @@ SECRET_KEY = '3+sut!-!nenk5zec6s_pz&g4+z&qbkoji2d9c%1*^rpo#toy6i'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['172.20.10.6', 'localhost', '10.102.73.199']
 
 
 # Application definition
@@ -38,8 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'channels',
-    'chat',
-    'rest_framework.authtoken'
+    'chat'
 ]
 
 MIDDLEWARE = [
@@ -140,6 +139,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ),
 }
 

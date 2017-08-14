@@ -15,7 +15,7 @@ from django.views.decorators.http import require_http_methods
 parsed_json = {}
 
 def index(request):
-    users = User.objects.all()
+    users = User.objects.exclude(id = request.GET.get('id'))
     result = json.dumps(list(users.values('username')))
     return HttpResponse(result, content_type='application/json')
 

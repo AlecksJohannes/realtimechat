@@ -10,7 +10,7 @@ def get_conversation_or_create_new(sender_id, recipient_id):
             Q(sender_id = sender_id, recipient_id = recipient_id)
             | Q(sender_id = recipient_id, recipient_id = sender_id))
 
-        messages = Message.objects.filter(Q(conversation_id = conversation.id)).values('body', 'is_read', 'user_id')
+        messages = Message.objects.filter(Q(conversation_id = conversation.id)).values('body', 'is_read', 'user_id').order_by('created_at')
         conversation_json['messages'] = list(messages)
         conversation_json['conversation_id'] = conversation.id
         return conversation_json

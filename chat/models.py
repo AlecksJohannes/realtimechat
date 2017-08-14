@@ -66,5 +66,6 @@ class Message(models.Model):
     user = models.ForeignKey(User)
     is_read = models.BooleanField(default=False)
     conversation = models.ForeignKey(Conversation)
+    created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return "%s" % (self.body)
