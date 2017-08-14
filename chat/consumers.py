@@ -12,11 +12,11 @@ def ws_connect(message, id):
     Group('conversation-%s' % id).add(message.reply_channel)
 
 def ws_receive(message, id):
-    message = json.loads(message['text'])
+    data = json.loads(message['text'])
     Group('conversation-%s' % id).send({
         'text': message['text'],
     })
 
-    message = Message( conversation_id = id , body = message['text'], user_id = message['sender_id'])
+    message = Message( conversation_id = id , body = data['text'], user_id = data['sender_id'])
     message.save()
 
